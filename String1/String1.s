@@ -676,7 +676,7 @@ doesStartsWith1:
 
 @ Returned register contents: X0 true or false
 @ All AAPCS are preserved.
-@       X0, X1, X2, X3 and X7 are changed and not preserved
+@       X0, X1, X2, X3 are changed and not preserved
 */
 
   .global String_startsWith_2
@@ -699,5 +699,78 @@ doesNotStartsWith2:
 
 doesStartsWith2:
   mov X0, #1
+
+  RET  LR
+
+/*
+@ Subroutine String_startsWith_2: Provided a pointer to a null-terminated string in X0 and a prefix string in X1
+@                                 this function will return true or false (1 or 0) if the string starts with the prefix string
+@ X0: Must point to a null terminated string
+@ X1: Must point to a null terminated string
+@ LR: Must contain the return address
+@ ALL AAPCS required registers are preserved,  r19-r29 and SP
+
+@ Returned register contents: X0 true or false
+@ All AAPCS are preserved.
+@       X0, X1, X2, X3 are changed and not preserved
+*/
+  .global String_endsWith
+
+String_endsWith: 
+  str X30, [SP, #-16]! 
+  str X1, [SP, #-16]!
+  str X0, [SP, #-16]!
+
+  //Get length of orig string
+  //Get length of suffix string
+  //set orig string address to the end
+  //minus orig string by length of suffix string
+  // do algorithm
+  
+  //Safe keep X1 param
+  mov X3, X1
+
+
+  //Get length of orig string
+  bl  String_length 
+  mov X4, X0 
+
+  //Get length of suffix string
+  mov X0, X3 
+  bl  String_length
+  //X4 = length of orig string
+  //X0 = length of suffix string
+
+  ldr X1, [SP], #16 //Pop orig string
+  ldr X2, [SP], #16 //Pop Suffix string
+
+  //Calcualate proper offsets and store into proper locations
+  add X1, X1, X4
+  sub X0, X1, X0
+  mov X1, X2
+
+  //X0 = orig string with proper offset
+  //X1 = suff string
+loopString_endsWith:
+  ldrb W2, [X1], #1
+  cmp  W2, #0
+  beq  doesEndsWith
+
+  ldrb W3, [X0], #1
+  cmp  W3, W2
+  bne  doesNotEndsWith
+
+  b    loopString_endsWith
+
+
+doesNotEndsWith:
+  mov X0, #0
+  ldr X30, [SP], #16
+
+  RET  LR
+
+doesEndsWith:
+  mov X0, #1
+  ldr X30, [SP], #16
 
   RET  LR
