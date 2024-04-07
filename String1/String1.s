@@ -337,6 +337,7 @@ String_substring_1:
   ldr X2, [SP], #16
   ldr X1, [SP], #16
 
+  //unresolved bug: if empty string, will segfault
   cmp X1, #1
   blt notInRangeSubstring1
   cmp X1, X0
@@ -430,3 +431,117 @@ finishedSubstring1:
   ldr X30, [SP], #16
 
   RET LR
+
+/*
+@ Subroutine String_substring_2: Provided a pointer to a null-terminated string in X0,
+@                                This function will return a DYNAMICALLY ALLOCATED substring of the given string from beginning index to end of string.
+@                                If the index is not within the range of the string, the function will return -1
+@ X0: Must point to a null terminated string
+@ X1: Beginning Index
+@ LR: Must contain the return address
+@ ALL AAPCS required registers are preserved,  r19-r29 and SP
+
+@ Returned register contents: X0, Dynamically allocated substring or -1 failure
+@ All AAPCS are preserved.
+@       ALL registers except r19-r29 & SP are modified and not preserved.
+*/
+  .global String_substring_2
+
+String_substring_2:
+  //Store LR for String_length calls
+  str X30, [SP, #-16]!  //PUSH LR
+  
+  //MUST push all r19-r29 registers onto stack to preserve AAPCS protocol after malloc() C function
+  str X19 , [SP, #-16]!  
+  str X20 , [SP, #-16]! 
+  str X21 , [SP, #-16]! 
+  str X22 , [SP, #-16]! 
+  str X23 , [SP, #-16]! 
+  str X24 , [SP, #-16]! 
+  str X25 , [SP, #-16]! 
+  str X26 , [SP, #-16]! 
+  str X27 , [SP, #-16]! 
+  str X28 , [SP, #-16]! 
+  str X29 , [SP, #-16]! 
+  
+  str X0 , [SP, #-16]!  //PUSH X0: String pointer
+  str X1 , [SP, #-16]!  //PUSH X1: BeginIndex
+
+  bl  String_length
+  
+  ldr X1, [SP], #16
+ 
+  //unresolved bug: if empty string, will segfault
+  cmp X1, #1
+  blt notInRangeSubstring2
+  cmp X1, X0
+  bgt notInRangeSubstring2
+
+  str X1 , [SP, #-16]!  //PUSH X1: BeginIndex
+
+  subs X0, X0, X1
+  bmi  notInRangeSubstring2
+
+  add X0, X0, #2
+  bl malloc
+
+  ldr X1, [SP], #16 //POP BeginIndex
+  ldr X2, [SP], #16 //POP string parameter
+
+  add X2, X2, X1    //Add base index to string parameter
+  sub X2, X2, #1    //Minus one because ^^ is one off
+
+  str X0, [SP, #-16]!  //Push original dynamically allocated string for return
+
+loopSubstring2:
+  cmp W1, #0
+  beq finishedSubstring1
+
+  ldrb W1, [X2], #1
+  strb W1, [X0], #1
+
+  b   loopSubstring2
+
+notInRangeSubstring2:
+  ldr X0 , [SP], #16
+
+  ldr X29, [SP], #16
+  ldr X28, [SP], #16
+  ldr X27, [SP], #16
+  ldr X26, [SP], #16
+  ldr X25, [SP], #16
+  ldr X24, [SP], #16
+  ldr X23, [SP], #16
+  ldr X22, [SP], #16
+  ldr X21, [SP], #16
+  ldr X20, [SP], #16
+  ldr X19, [SP], #16
+
+  ldr X30, [SP], #16
+
+  mov X0, #-1
+
+  RET  LR
+
+
+finishedSubstring2: 
+  mov  W1,  #0
+  strb W1, [X0]
+
+  ldr X0 , [SP], #16
+
+  ldr X29, [SP], #16
+  ldr X28, [SP], #16
+  ldr X27, [SP], #16
+  ldr X26, [SP], #16
+  ldr X25, [SP], #16
+  ldr X24, [SP], #16
+  ldr X23, [SP], #16
+  ldr X22, [SP], #16
+  ldr X21, [SP], #16
+  ldr X20, [SP], #16
+  ldr X19, [SP], #16
+
+  ldr X30, [SP], #16
+
+  RET LR  
