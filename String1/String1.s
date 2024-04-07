@@ -544,4 +544,54 @@ finishedSubstring2:
 
   ldr X30, [SP], #16
 
-  RET LR  
+  RET LR 
+
+/*
+@ Subroutine String_charAt: Provided a pointer to a null-terminated string in X0 and an index in the string,
+@                           this function will return the charecter at that index. If the index is not in range, the function returns 0
+@ X0: Must point to a null terminated string
+@ X1: Index
+@ LR: Must contain the return address
+@ ALL AAPCS required registers are preserved,  r19-r29 and SP
+
+@ Returned register contents: X0 Char at index or 0 
+@ All AAPCS are preserved.
+@       dfklgh;d
+*/
+  .global String_charAt
+
+String_charAt:
+  str X30, [SP, #-16]!
+  
+  str X0, [SP, #-16]!
+  str X1, [SP, #-16]!
+
+  bl  String_length
+
+  ldr X2, [SP], #16  //Pop index
+  ldr X1, [SP], #16  //Pop String pointer
+
+  cmp X1, #1
+  blt notInRangeString_charAt
+  cmp X2, X0
+  bgt notInRangeString_charAt
+  
+  b   finishedString_charAt
+
+
+notInRangeString_charAt:
+  mov X0, #0
+  ldr X30, [SP], #16
+
+  RET  LR
+
+
+finishedString_charAt:
+  add X1, X1, X2
+  sub X1, X1, #1
+
+  ldrb W0, [X1]
+
+  ldr X30, [SP], #16
+
+  RET  LR
