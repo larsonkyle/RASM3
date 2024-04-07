@@ -556,7 +556,7 @@ finishedSubstring2:
 
 @ Returned register contents: X0 Char at index or 0 
 @ All AAPCS are preserved.
-@       X0, X1, X2 are changed and not preserved
+@       X0, X1, X2 and X7 are changed and not preserved
 */
   .global String_charAt
 
@@ -598,17 +598,17 @@ finishedString_charAt:
 
 
 /*
-@ Subroutine String_charAt: Provided a pointer to a null-terminated string in X0 and an index in the string,
-@                           this function will return the charecter at that index. If the index is not in range, the function returns 0
+@ Subroutine String_startsWith_1: Provided a pointer to a null-terminated string in X0, a prefix string in X1, and an index in X2
+@                                 this function will return true or false (1 or 0) if the string starting at given index, matches the prefix string
 @ X0: Must point to a null terminated string
 @ X1: Must point to a null terminated string
 @ X2: Starting position
 @ LR: Must contain the return address
 @ ALL AAPCS required registers are preserved,  r19-r29 and SP
 
-@ Returned register contents: X0 Char at index or 0 
+@ Returned register contents: X0 true or false
 @ All AAPCS are preserved.
-@       X0, X1, X2 are changed and not preserved
+@       X0, X1, X2, X3 and X7 are changed and not preserved
 */
   .global String_startsWith_1
 
@@ -662,5 +662,42 @@ doesNotStartsWith1:
 doesStartsWith1:
   mov X0, #1
   ldr X30, [SP], #16
+
+  RET  LR
+
+
+/*
+@ Subroutine String_startsWith_2: Provided a pointer to a null-terminated string in X0 and a prefix string in X1
+@                                 this function will return true or false (1 or 0) if the string starts with the prefix string
+@ X0: Must point to a null terminated string
+@ X1: Must point to a null terminated string
+@ LR: Must contain the return address
+@ ALL AAPCS required registers are preserved,  r19-r29 and SP
+
+@ Returned register contents: X0 true or false
+@ All AAPCS are preserved.
+@       X0, X1, X2, X3 and X7 are changed and not preserved
+*/
+
+  .global String_startsWith_2
+
+String_startsWith_2:
+  ldrb W2, [X1], #1
+  cmp  W2, #0
+  beq doesStartsWith2
+
+  ldrb W3, [X0], #1
+  cmp  W3, W2
+  bne doesNotStartsWith2
+
+  b   String_startsWith_2
+
+doesNotStartsWith2:
+  mov X0, #0
+
+  RET  LR
+
+doesStartsWith2:
+  mov X0, #1
 
   RET  LR
