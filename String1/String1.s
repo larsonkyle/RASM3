@@ -48,7 +48,7 @@ return:
 @ LR: Must contain the return address
 @ ALL AAPCS required registers are preserved,  r19-r29 and SP
 
-@ Returned register contents:
+@ Returned register contents: X0 of either 1 or 0 (true or false)
 @ All AAPCS are preserved.
 @       X0, X1, X2, X3, X4, X7 are modified and not preserved
 */
@@ -120,7 +120,7 @@ trueString_equals:
 @ LR: Must contain the return address
 @ ALL AAPCS required registers are preserved,  r19-r29 and SP
 
-@ Returned register contents:
+@ Returned register contents: X0 of either 1 or 0 (true or false)
 @ All AAPCS are preserved.
 @       X0, X1, X2, X3, X4, X7 are modified and not preserved
 */
@@ -202,4 +202,94 @@ trueString_equalsIgnoreCase:
   ldr X30, [SP], #16
 
   RET  LR
+
+/*
+@ Subroutine String_copy: Provided a pointer to a null-terminated string in X0,
+@                         This function will return a DYNAMICALLY ALLOCATED copy of the given null terminated string in X0.
+@ X0: Must point to a null terminated string
+@ LR: Must contain the return address
+@ ALL AAPCS required registers are preserved,  r19-r29 and SP
+
+@ Returned register contents: X0, Address of the dynamically allocated string copy
+@ All AAPCS are preserved.
+@       ALL registers except r19-r29 & SP are modified and not preserved.
+*/
+  .global String_copy
+
+  .text
+
+String_copy:
+  //Store LR for String_length calls
+  str X30, [SP, #-16]!  //PUSH LR
+  
+  //MUST push all r19-r29 registers onto stack to preserve AAPCS protocol after malloc() C function
+  str X19 , [SP, #-16]!  
+  str X20 , [SP, #-16]! 
+  str X21 , [SP, #-16]! 
+  str X22 , [SP, #-16]! 
+  str X23 , [SP, #-16]! 
+  str X24 , [SP, #-16]! 
+  str X25 , [SP, #-16]! 
+  str X26 , [SP, #-16]! 
+  str X27 , [SP, #-16]! 
+  str X28 , [SP, #-16]! 
+  str X29 , [SP, #-16]! 
+  
+  str X0 , [SP, #-16]!  //PUSH X0: Parameter
+
+  //Get length of string to copy
+  bl  String_length
+  
+  //Save String_length
+  str X0 , [SP, #-16]!
+
+  //Add one to string length for null char
+  add X0, X0, #1        
+  bl  malloc
+ 
+  ldr X3, [SP], #16     //Pop String_length for loop
+  ldr X1, [SP], #16     //Pop original passed parameter
+  str X0, [SP, #-16]!   //Save original malloced string address for returning
+
+loopString_copy:
+  //Load register with one byte from original parameter
+  //Store it into the malloced string
+  //post increment both pointers, and continue for the length of the original string.
+  // X0 = malloced string
+  // X1 = parameter
+  // X3 = String_length or loopControl
+  
+  ldrb W2, [X1], #1
+  strb W2, [X0], #1
+  
+
+  cmp X3, #0
+  beq finishedString_copy
+  sub X3, X3, #1
+
+  b   loopString_copy
+
+finishedString_copy:
+  mov  W2, #0
+  strb W2, [X0], #1
+  
+  ldr X0, [SP], #16
+ 
+  ldr X29, [SP], #16
+  ldr X28, [SP], #16
+  ldr X27, [SP], #16
+  ldr X26, [SP], #16
+  ldr X25, [SP], #16
+  ldr X24, [SP], #16
+  ldr X23, [SP], #16
+  ldr X22, [SP], #16
+  ldr X21, [SP], #16
+  ldr X20, [SP], #16
+  ldr X19, [SP], #16
+
+  ldr X30, [SP], #16
+
+  RET  LR
+  
+  
 
