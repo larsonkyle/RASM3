@@ -556,7 +556,7 @@ finishedSubstring2:
 
 @ Returned register contents: X0 Char at index or 0 
 @ All AAPCS are preserved.
-@       dfklgh;d
+@       X0, X1, X2 are changed and not preserved
 */
   .global String_charAt
 
@@ -571,7 +571,7 @@ String_charAt:
   ldr X2, [SP], #16  //Pop index
   ldr X1, [SP], #16  //Pop String pointer
 
-  cmp X1, #1
+  cmp X2, #1
   blt notInRangeString_charAt
   cmp X2, X0
   bgt notInRangeString_charAt
@@ -592,6 +592,75 @@ finishedString_charAt:
 
   ldrb W0, [X1]
 
+  ldr X30, [SP], #16
+
+  RET  LR
+
+
+/*
+@ Subroutine String_charAt: Provided a pointer to a null-terminated string in X0 and an index in the string,
+@                           this function will return the charecter at that index. If the index is not in range, the function returns 0
+@ X0: Must point to a null terminated string
+@ X1: Must point to a null terminated string
+@ X2: Starting position
+@ LR: Must contain the return address
+@ ALL AAPCS required registers are preserved,  r19-r29 and SP
+
+@ Returned register contents: X0 Char at index or 0 
+@ All AAPCS are preserved.
+@       X0, X1, X2 are changed and not preserved
+*/
+  .global String_startsWith_1
+
+String_startsWith_1:
+  str X30, [SP, #-16]!
+  
+  str X0, [SP, #-16]!
+  str X1, [SP, #-16]!
+  str X2, [SP, #-16]!
+
+  bl  String_length
+
+  ldr X3, [SP], #16  //Pop position
+  ldr X2, [SP], #16  //Pop mini string
+  ldr X1, [SP], #16  //Pop big string
+
+  cmp X3, #1
+  blt doesNotStartsWith1
+  cmp X3, X0
+  bgt doesNotStartsWith1
+
+  mov X0, X1
+  mov X1, X2
+  mov X2, X3
+
+  /*
+  X0 - big string
+  X1 - prefix string
+  X2 - position
+  */
+  add X0, X0, X2
+
+loopStartsWith1:
+  ldrb W2, [X1], #1
+  cmp  W2, #0
+  beq doesStartsWith1
+
+  ldrb W3, [X0], #1
+  cmp  W3, W2
+  bne doesNotStartsWith1
+
+  b loopStartsWith1
+
+
+doesNotStartsWith1:
+  mov X0, #0
+  ldr X30, [SP], #16
+
+  RET  LR
+
+doesStartsWith1:
+  mov X0, #1
   ldr X30, [SP], #16
 
   RET  LR
