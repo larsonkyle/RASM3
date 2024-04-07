@@ -291,5 +291,142 @@ finishedString_copy:
 
   RET  LR
   
-  
+/*
+@ Subroutine String_substring_1: Provided a pointer to a null-terminated string in X0,
+@                                This function will return a DYNAMICALLY ALLOCATED substring of the given string from beginning index to end index.
+@                                If the indexes are not within the range of the string, the function will return -1
+@ X0: Must point to a null terminated string
+@ X1: Beginning Index
+@ X2: Ending Index
+@ LR: Must contain the return address
+@ ALL AAPCS required registers are preserved,  r19-r29 and SP
 
+@ Returned register contents: X0, Dynamically allocated substring or -1 failure
+@ All AAPCS are preserved.
+@       ALL registers except r19-r29 & SP are modified and not preserved.
+*/
+  .global String_substring_1
+
+String_substring_1:
+  //Store LR for String_length calls
+  str X30, [SP, #-16]!  //PUSH LR
+  
+  //MUST push all r19-r29 registers onto stack to preserve AAPCS protocol after malloc() C function
+  str X19 , [SP, #-16]!  
+  str X20 , [SP, #-16]! 
+  str X21 , [SP, #-16]! 
+  str X22 , [SP, #-16]! 
+  str X23 , [SP, #-16]! 
+  str X24 , [SP, #-16]! 
+  str X25 , [SP, #-16]! 
+  str X26 , [SP, #-16]! 
+  str X27 , [SP, #-16]! 
+  str X28 , [SP, #-16]! 
+  str X29 , [SP, #-16]! 
+  
+  str X0 , [SP, #-16]!  //PUSH X0: String pointer
+  str X1 , [SP, #-16]!  //PUSH X1: BeginIndex
+  str X2 , [SP, #-16]!  //PUSH X1: EndIndex
+
+  //call stringlength
+  //determine if indexes are in range
+  //allocate memory
+  //do algorithm
+  bl  String_length
+
+  ldr X2, [SP], #16
+  ldr X1, [SP], #16
+
+  cmp X1, #1
+  blt notInRangeSubstring1
+  cmp X1, X0
+  bgt notInRangeSubstring1
+
+  cmp X2, #1
+  blt notInRangeSubstring1
+  cmp X2, X0
+  bgt notInRangeSubstring1
+ 
+  subs X0, X2, X1
+  bmi  notInRangeSubstring1
+
+  str X1 , [SP, #-16]!  //PUSH X1: BeginIndex
+  str X2 , [SP, #-16]!  //PUSH X1: EndIndex
+  
+  add X0, X0, #2
+  bl  malloc
+
+  //Pop out variables
+  ldr X2, [SP], #16 //Pop endIndex
+  ldr X1, [SP], #16 //pop beginIndex
+  ldr X3, [SP], #16 //pop parameter
+  
+  //Set up loop control
+  sub X4, X2, X1 //endIndex - beginIndex
+  add X4, X4, #1 //Add one, since ^^ is one off
+
+  //Set up starting address
+  add X3, X3, X1 //start address + beginIndex
+  sub X3, X3, #1 //minus one, since ^^ is one off
+
+  str X0, [SP, #-16]!  //Push original dynamically allocated string for return
+  
+/*
+X0 = dynamically allocated memory
+X3 = orginal string
+X4 = loopcontrol
+*/
+
+loopSubstring1:
+  ldrb W1, [X3], #1
+  strb W1, [X0], #1
+
+  sub X4, X4, #1
+  cmp X4, #0
+  beq finishedSubstring1
+
+  b   loopSubstring1
+
+
+notInRangeSubstring1:
+  ldr X0 , [SP], #16
+
+  ldr X29, [SP], #16
+  ldr X28, [SP], #16
+  ldr X27, [SP], #16
+  ldr X26, [SP], #16
+  ldr X25, [SP], #16
+  ldr X24, [SP], #16
+  ldr X23, [SP], #16
+  ldr X22, [SP], #16
+  ldr X21, [SP], #16
+  ldr X20, [SP], #16
+  ldr X19, [SP], #16
+
+  ldr X30, [SP], #16
+
+  mov X0, #-1
+
+  RET  LR
+
+finishedSubstring1:
+  mov  W1,  #0
+  strb W1, [X0]
+
+  ldr X0 , [SP], #16
+
+  ldr X29, [SP], #16
+  ldr X28, [SP], #16
+  ldr X27, [SP], #16
+  ldr X26, [SP], #16
+  ldr X25, [SP], #16
+  ldr X24, [SP], #16
+  ldr X23, [SP], #16
+  ldr X22, [SP], #16
+  ldr X21, [SP], #16
+  ldr X20, [SP], #16
+  ldr X19, [SP], #16
+
+  ldr X30, [SP], #16
+
+  RET LR
