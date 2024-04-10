@@ -379,7 +379,7 @@ String_substring_1:
   str X2 , [SP, #-16]!  //PUSH X1: EndIndex
   
   //Calculate memory to allocate
-  add X0, X0, #2 //Add two to original calculation. 1 for null char, one for being one off (end index - begin index is one off)
+  add X0, X0, #1 //Add one to original calculation 1 for null char.
   bl  malloc     //Call malloc
 
   //Pop out variables
@@ -393,7 +393,7 @@ String_substring_1:
 
   //Set up starting address
   add X3, X3, X1 //start address + beginIndex
-  sub X3, X3, #1 //minus one, since ^^ is one off
+//  sub X3, X3, #1 //minus one, since ^^ is one off
 
   str X0, [SP, #-16]! //Push original dynamically allocated string for return
   
@@ -410,8 +410,8 @@ loopSubstring1:
 
   //Decrement counter, then check for null
   sub X4, X4, #1    //Decrement counter
-  cmp X4, #0        //Check if byte was null char
-  beq finishedSubstring1 //If null char, then branch to finished
+  cmp X4, #0        //Check if counter reached 0
+  beq finishedSubstring1 //If reached 0 branch to finished
 
   b   loopSubstring1 //Loop algorithm
 
@@ -519,8 +519,8 @@ String_substring_2:
   subs X0, X0, X1       //Calculate substring size
   bmi  notInRangeSubstring2 //If substring is larger than size, then branch to not in range
 
-  //Add null and off by one for memory allocation
-  add X0, X0, #2        //Add two to substring size, one for null char and one for being one off (beginIndex - end is one off)
+  //Add null for memory allocation
+  add X0, X0, #1        //Add one to substring size one for null char
   bl malloc
 
   //Load parameters
@@ -529,7 +529,6 @@ String_substring_2:
 
   //Calculate substring offset
   add X2, X2, X1        //Add base index to string parameter
-  sub X2, X2, #1        //Minus one because ^^ is one off
 
   //Save original dynamically allocated string address
   str X0, [SP, #-16]!   //Push original dynamically allocated string for return
@@ -644,7 +643,6 @@ notInRangeString_charAt:
 finishedString_charAt:
   //Calculate index position in string
   add X1, X1, X2     //Add index to string address
-  sub X1, X1, #1     //Sub one because ^^ is one off
 
   //Load char from charecter at index
   ldrb W0, [X1]      //Load char from index position
@@ -704,7 +702,6 @@ String_startsWith_1:
   */
   //Calculate starting position in string
   add X0, X0, X2       //X0 = X0 + X2
-
 loopStartsWith1:
   //Check for Null
   ldrb W2, [X1], #1    //Load char from Prefix String
