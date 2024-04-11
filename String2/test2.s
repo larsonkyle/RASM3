@@ -1,4 +1,5 @@
     .global _start
+    .global Print_integer
     
     .data
     
@@ -13,10 +14,10 @@ szFirstInstSub:         .asciz      "15. String_indexOf_3(s2,\"eggs\")         =
 szLastInst:             .asciz      "16. String_lastIndexOf_1(s2,'g')        = "
 szLastInstBefore:       .asciz      "17. String_lastIndexOf_2(s2,'g',6)      = "
 szLastInstSub:          .asciz      "18. String_lastIndexOf_3(s2,\"egg\")      = "
-szConcatStrWithSub:     .asciz      "19. String_concat(s1, \" \"); String_concat(s1, s2) =  "
-szReplace:              .asciz      "20. String_replace(s1,'a','o')          = "
-szStringLowerCase:      .asciz      "21. String_toLowerCase(s1)              = "
-szStringUpperCase:      .asciz      "22. String_toUpperCase(s1)              = "
+szReplace:              .asciz      "19. String_replace(s1,'a','o')          = \""
+szStringLowerCase:      .asciz      "20. String_toLowerCase(s1)              = \""
+szStringUpperCase:      .asciz      "21. String_toUpperCase(s1)              = \""
+szConcatStrWithSub:     .asciz      "22. String_concat(s1, \" \")\n    String_concat(s1, s2)               = \""
 
 subStr1:                .asciz      "eggs"
 substr2:                .asciz      "egg"
@@ -26,20 +27,10 @@ strPointer:             .quad       8
 
 szNumBuf:               .skip       20
 
-chLF:  .byte 0xa
+chLF:                   .byte       0xa
+chQ:                    .byte       0x22
 
     .text
-
-Print_integer:
-    str     LR,[SP,#-16]!
-    ldr     x1,=szNumBuf
-    bl      int64asc 
-    ldr     x0,=szNumBuf 
-    bl      putstring
-    ldr     x0,=chLF
-    bl      putch
-    ldr     LR,[SP],#16      
-    ret     lr    
 
 //main:
 _start:
@@ -121,6 +112,9 @@ _start:
     str     x0,[x1]
     bl      putstring
 
+    ldr     x0,=chQ
+    bl      putch
+
     ldr     x0,=chLF
     bl      putch
 
@@ -144,6 +138,9 @@ _start:
     str     x0,[x1]
     bl      putstring
 
+    ldr     x0,=chQ
+    bl      putch
+
     ldr     x0,=chLF
     bl      putch
     
@@ -166,6 +163,9 @@ _start:
 
     str     x0,[x1]
     bl      putstring
+
+    ldr     x0,=chQ
+    bl      putch
 
     ldr     x0,=chLF
     bl      putch
@@ -205,6 +205,9 @@ _start:
     str     x0,[x1]
     bl      putstring
 
+    ldr     x0,=chQ
+    bl      putch
+
     ldr     x0,=chLF
     bl      putch
 
@@ -216,5 +219,16 @@ end:
     mov     x0,#0
     mov     X8,#93
     svc     0
+
+Print_integer:
+    str     LR,[SP,#-16]!
+    ldr     x1,=szNumBuf
+    bl      int64asc 
+    ldr     x0,=szNumBuf 
+    bl      putstring
+    ldr     x0,=chLF
+    bl      putch
+    ldr     LR,[SP],#16      
+    ret     lr
 
     .end

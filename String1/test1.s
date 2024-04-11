@@ -22,9 +22,9 @@ szEqualsIG2:            .asciz      "5.  String_equalsIgnoreCase(s1,s2)      = "
 szString_copy:          .asciz      "6.  s4 = String_copy(s1)\n"
 szCopyS1:               .asciz      "    s1 = "
 szCopyS4:               .asciz      "    s4 = "
-szSubstring1:           .asciz      "7.  String_substring_1(s3,4,14)         = "
-szSubstring2:           .asciz      "8.  String_substring_2(s3,7)            = "
-szCharAt:               .asciz      "9.  String_charAt(s2,4)                 = "
+szSubstring1:           .asciz      "7.  String_substring_1(s3,4,14)         = \""
+szSubstring2:           .asciz      "8.  String_substring_2(s3,7)            = \""
+szCharAt:               .asciz      "9.  String_charAt(s2,4)                 = '"
 szStartsWith1:          .asciz      "10. String_startsWith_1(s1,11,\"hat.\")   = "
 szStartsWith2:          .asciz      "11. String_startsWith_2(s1,\"Cat\")       = "
 szEndsWith:             .asciz      "12. String_endsWith(s1,\"in the hat.\")   = "
@@ -37,6 +37,8 @@ strPtr:   .quad 0
 
 chBuffer: .byte 0
 chLF:     .byte 0xA
+chQ:      .byte 0x22
+chA:      .byte 0x27
 
 .text
 
@@ -196,6 +198,9 @@ testCase6:
   str X0, [X1]
   bl  putstring
 
+  ldr x0,=chQ
+  bl  putch
+
   ldr X0, =chLF
   bl  putch
 
@@ -214,6 +219,9 @@ testCase6:
   ldr X1, =strPtr
   str X0, [X1]
   bl  putstring
+
+  ldr x0,=chQ
+  bl  putch
 
   ldr X0, =chLF
   bl  putch
@@ -234,6 +242,9 @@ testCase6:
   strb W0, [X1]
 
   ldr X0, =chBuffer
+  bl  putch
+
+  ldr x0,=chA
   bl  putch
   
   ldr X0, =chLF
