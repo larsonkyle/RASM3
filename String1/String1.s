@@ -17,7 +17,7 @@
 @       X0, X1, X2, and X7 are modified and not preserved
 
 */
-  .global String_length  //@Pass entry point name to linker
+//  .global String_length  //@Pass entry point name to linker
 
   .text
 
