@@ -288,10 +288,6 @@ loopString_copy:
 
 //Function return
 finishedString_copy:
-  //Load null char into string
-  mov  W2, #0           //Mov null char
-  strb W2, [X0], #1     //Store null char
-  
   //Pop address of original allocated string
   ldr X0, [SP], #16     //Pop original address of allocated string
  
@@ -571,8 +567,8 @@ notInRangeSubstring2:
 
 finishedSubstring2: 
   //Finish string with null char
-  mov  W1,  #0          //Move null char into W1 
-  strb W1, [X0]         //Store null char at end of substring
+//  mov  W1,  #0          //Move null char into W1 
+//  strb W1, [X0]         //Store null char at end of substring
 
   //Load original dynamically allocated string
   ldr X0 , [SP], #16    //Load original allocated string into X0
