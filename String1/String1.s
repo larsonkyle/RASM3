@@ -375,7 +375,7 @@ String_substring_1:
   str X2 , [SP, #-16]!  //PUSH X1: EndIndex
   
   //Calculate memory to allocate
-  add X0, X0, #1 //Add one to original calculation 1 for null char.
+  add X0, X0, #2 // ** Allocate 2 extra bytes because of x2 - x1 is off by one and for null terminator
   bl  malloc     //Call malloc
 
   //Pop out variables
@@ -389,7 +389,7 @@ String_substring_1:
 
   //Set up starting address
   add X3, X3, X1 //start address + beginIndex
-//  sub X3, X3, #1 //minus one, since ^^ is one off
+  // ** don't need to subtract one
 
   str X0, [SP, #-16]! //Push original dynamically allocated string for return
   
@@ -404,8 +404,9 @@ loopSubstring1:
   ldrb W1, [X3], #1 //Load char of substring in string
   strb W1, [X0], #1 //Store char into allocated string
 
+  sub X4, X4, #1    //Decrement counter after - needs to run or the # of bytes in the substring
+
   //Decrement counter, then check for null
-  sub X4, X4, #1    //Decrement counter
   cmp X4, #0        //Check if counter reached 0
   beq finishedSubstring1 //If reached 0 branch to finished
 
@@ -516,7 +517,7 @@ String_substring_2:
   bmi  notInRangeSubstring2 //If substring is larger than size, then branch to not in range
 
   //Add null for memory allocation
-  add X0, X0, #1        //Add one to substring size one for null char
+  add X0, X0, #2        // ** Allocate 2 extra bytes because of x2 - x1 is off by one and for null terminator
   bl malloc
 
   //Load parameters
