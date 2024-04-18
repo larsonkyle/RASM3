@@ -452,6 +452,7 @@ String_replace:
     str     X29,[SP, #-16]!
 
     stp     LR,x0,[SP,#-16]!    // push LR and address of string to the stack
+    stp     x1,x2,[SP,#-16]!    // push CTR and CTRW to the stack
 
     bl      String_length       // get length of string
     add     x0,x0,#1            // add 1 to length of string to account for null terminator
