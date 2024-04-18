@@ -348,11 +348,22 @@ w3 - current character
 return:
 x0 - address of new string
 
-not preserved:
-no registers are preserved, as we are caling malloc
+AAPCS registers x19 - x29 are preserved (none others guaranteed)
 */
 
 String_concat:
+    str     X19,[SP, #-16]! // preserved required AAPCS registers
+    str     X20,[SP, #-16]!
+    str     X21,[SP, #-16]!
+    str     X22,[SP, #-16]!
+    str     X23,[SP, #-16]!
+    str     X24,[SP, #-16]!
+    str     X25,[SP, #-16]!
+    str     X26,[SP, #-16]!
+    str     X27,[SP, #-16]!
+    str     X28,[SP, #-16]!
+    str     X29,[SP, #-16]!
+
     str     LR,[SP,#-16]!       // push LR to the stack
     stp     x0,x1,[SP,#-16]!    // push address of CT string and C string to the stack
 
@@ -391,6 +402,19 @@ C_copy:
 
 complete_concat:
     ldr     x0,[SP],#16         // pop address of dyn alloc mem off the stack
+
+    ldr     X29,[SP],#16        // preserved required AAPCS registers
+    ldr     X28,[SP],#16
+    ldr     X27,[SP],#16
+    ldr     X26,[SP],#16
+    ldr     X25,[SP],#16
+    ldr     X24,[SP],#16
+    ldr     X23,[SP],#16
+    ldr     X22,[SP],#16
+    ldr     X21,[SP],#16
+    ldr     X20,[SP],#16
+    ldr     X19,[SP],#16
+
     ret     lr                  // return to caller
 
 /*
@@ -411,13 +435,23 @@ w4 - current character
 return:
 x0 - address of new string
 
-not preserved:
-no registers are preserved, as we are caling malloc
+AAPCS registers x19 - x29 are preserved (none others guaranteed)
 */
 
 String_replace:
+    str     X19,[SP, #-16]! // preserved required AAPCS registers
+    str     X20,[SP, #-16]!
+    str     X21,[SP, #-16]!
+    str     X22,[SP, #-16]!
+    str     X23,[SP, #-16]!
+    str     X24,[SP, #-16]!
+    str     X25,[SP, #-16]!
+    str     X26,[SP, #-16]!
+    str     X27,[SP, #-16]!
+    str     X28,[SP, #-16]!
+    str     X29,[SP, #-16]!
+
     stp     LR,x0,[SP,#-16]!    // push LR and address of string to the stack
-    stp     x1,x2,[SP,#-16]!    // push CTR and CTRW to the stack
 
     bl      String_length       // get length of string
     add     x0,x0,#1            // add 1 to length of string to account for null terminator
@@ -447,6 +481,19 @@ CTR_CTRW_swap_replace:
 complete_replace:
     strb    w4,[x0]             // store null terminator (must do after loop as there is conditional regarding what is stored)
     ldr     x0,[SP],#16         // pop address of dyn alloc mem off the stack
+
+    ldr     X29,[SP],#16        // preserved required AAPCS registers
+    ldr     X28,[SP],#16
+    ldr     X27,[SP],#16
+    ldr     X26,[SP],#16
+    ldr     X25,[SP],#16
+    ldr     X24,[SP],#16
+    ldr     X23,[SP],#16
+    ldr     X22,[SP],#16
+    ldr     X21,[SP],#16
+    ldr     X20,[SP],#16
+    ldr     X19,[SP],#16
+
     ret     lr                  // return to caller
 
 /*
@@ -464,11 +511,22 @@ x2 - current char
 return:
 x0 - address of new lowercase string
 
-not preserved:
-no registers are preserved, as we are caling malloc
+AAPCS registers x19 - x29 are preserved (none others guaranteed)
 */
 
 String_toLowerCase:
+    str     X19,[SP, #-16]! // preserved required AAPCS registers
+    str     X20,[SP, #-16]!
+    str     X21,[SP, #-16]!
+    str     X22,[SP, #-16]!
+    str     X23,[SP, #-16]!
+    str     X24,[SP, #-16]!
+    str     X25,[SP, #-16]!
+    str     X26,[SP, #-16]!
+    str     X27,[SP, #-16]!
+    str     X28,[SP, #-16]!
+    str     X29,[SP, #-16]!
+
     stp     LR,x0,[SP,#-16]!    // push LR and string address to the stack
 
     bl      String_length       // get length of string
@@ -497,6 +555,19 @@ eval_continue_end_toLowerCase:
     bne     loop_toLowerCase    // go to the top of the loop to get new character
 
     ldr     x0,[SP],#16         // pop address of dyn alloc mem off the stack
+
+    ldr     X29,[SP],#16        // preserved required AAPCS registers
+    ldr     X28,[SP],#16
+    ldr     X27,[SP],#16
+    ldr     X26,[SP],#16
+    ldr     X25,[SP],#16
+    ldr     X24,[SP],#16
+    ldr     X23,[SP],#16
+    ldr     X22,[SP],#16
+    ldr     X21,[SP],#16
+    ldr     X20,[SP],#16
+    ldr     X19,[SP],#16
+
     ret     lr                  // return to caller
 
 /*
@@ -514,11 +585,22 @@ x2 - current char
 return:
 x0 - address of new uppercase string
 
-not preserved:
-no registers are preserved, as we are caling malloc
+AAPCS registers x19 - x29 are preserved (none others guaranteed)
 */
 
 String_toUpperCase:
+    str     X19,[SP, #-16]! // preserved required AAPCS registers
+    str     X20,[SP, #-16]!
+    str     X21,[SP, #-16]!
+    str     X22,[SP, #-16]!
+    str     X23,[SP, #-16]!
+    str     X24,[SP, #-16]!
+    str     X25,[SP, #-16]!
+    str     X26,[SP, #-16]!
+    str     X27,[SP, #-16]!
+    str     X28,[SP, #-16]!
+    str     X29,[SP, #-16]!
+
     stp     LR,x0,[SP,#-16]!    // push LR and string address to the stack
 
     bl      String_length       // get length of string
@@ -547,6 +629,19 @@ eval_continue_end_toUpperCase:
     bne     loop_toUpperCase    // go to the top of the loop to get new character
 
     ldr     x0,[SP],#16         // pop address of dyn alloc mem off the stack
+
+    ldr     X29,[SP],#16        // preserved required AAPCS registers
+    ldr     X28,[SP],#16
+    ldr     X27,[SP],#16
+    ldr     X26,[SP],#16
+    ldr     X25,[SP],#16
+    ldr     X24,[SP],#16
+    ldr     X23,[SP],#16
+    ldr     X22,[SP],#16
+    ldr     X21,[SP],#16
+    ldr     X20,[SP],#16
+    ldr     X19,[SP],#16
+
     ret     lr                  // return to caller
     
     .end
